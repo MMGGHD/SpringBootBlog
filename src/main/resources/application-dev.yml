@@ -1,0 +1,32 @@
+server:
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+
+  # 포트 8080 << default
+  port: 8080
+
+# h2는 메모리데이터로 가짜 DB, 스프링이 켜질때 같이 켜졌다가 같이 꺼짐
+# MODE를 설정(방언을 설정)해서 DBMS처럼 사용할수 있다.
+spring:
+  datasource:
+    url: jdbc:h2:mem:test;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  # JPA의 format_sql << 쿼리를 보기좋게 만들어줌
+
+  output:
+    ansi:
+      enabled: always
