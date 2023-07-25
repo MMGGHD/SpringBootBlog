@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    {{! 컬렉션(객체)에서 값 출력하는법 }}
+    {{ list.0.id }}
+    <h1>users 파일 연결확인</h1>
+    {{! 컬렉션이 들어오면 반복문/ boolean이 들어오면 if 문 }}
+    {{#list}}
+    {{ id }}
+    {{ username }}
+    {{/list}}
+  </body>
+</html>
