@@ -18,7 +18,14 @@ spring:
   h2:
     console:
       enabled: true
+  sql:
+    init:
+      data-locations:
+        # 클래스패스를 등록해놓아야 그 안에 있는 데이터(java파일, 데이터파일 등) 가져올수있다.
+        - classpath:db/data.sql
   jpa:
+    # defer-datasource-initialization: true << 테이블이 가장 먼저 만들어지게 하는 명령어
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
     show-sql: true

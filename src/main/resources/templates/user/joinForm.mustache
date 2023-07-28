@@ -12,13 +12,16 @@
         <div class="card-body">
             <form action="/join" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="mb-3 mt-1">
-                    <input type="text" class="form-control" placeholder="Enter username" name="username">
+                    <input type="text" class="form-control" placeholder="Enter username" name="username" required
+                        maxlength="20">
                 </div>
                 <div class="mb-3">
-                    <input type="password" class="form-control" placeholder="Enter password" name="password">
+                    <input type="password" class="form-control" placeholder="Enter password" name="password" required
+                        maxlength="20">
                 </div>
                 <div class="mb-3">
-                    <input type="email" class="form-control" placeholder="Enter email" name="email">
+                    <input type="email" class="form-control" placeholder="Enter email" name="email" required
+                        maxlength="20">
                 </div>
 
                 <!-- type="submit" << Form태그 input 내의 정보를 '한번에' 전송한다.-->
@@ -27,7 +30,5 @@
         </div>
     </div>
     </form>
-
-
 
     {{> /layout/footer}}
