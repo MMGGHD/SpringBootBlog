@@ -28,6 +28,7 @@ public class Board {
 
     @Column(nullable = true)
     private String content;
+
     // 생성일
     private Timestamp createdAt;
 
