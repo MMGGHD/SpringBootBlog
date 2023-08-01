@@ -9,7 +9,7 @@
         <div class="card-body">
     <form action="/board/save" method="post" enctype="application/x-www-form-urlencoded">
         <div class="mb-3">
-            <input type="text" class="form-control" placeholder="Enter tilte" name="tilte">
+            <input type="text" class="form-control" placeholder="Enter tilte" name="title" required maxlength="100">
         </div>
         <div class="mb-3">
 <!-- textarea는 태그 열고 닫히는 가운데에 사용자가 작성한 내용이 들어온다.-->
@@ -22,7 +22,5 @@
         <button type="submit" class="btn btn-primary form-control">글쓰기 완료</button>
         </div></div></div>
     </form>
-
-
 
     {{> /layout/footer}}

@@ -10,6 +10,14 @@ server:
 # h2는 메모리데이터로 가짜 DB, 스프링이 켜질때 같이 켜졌다가 같이 꺼짐
 # MODE를 설정(방언을 설정)해서 DBMS처럼 사용할수 있다.
 spring:
+  mustache:
+    servlet:
+      #  mustache 에서 session에 접근할수 있게 true
+      expose-session-attributes: true
+
+      #  mustache 에서 request 접근할수 있게 true
+      expose-request-attributes: true
+
   datasource:
     url: jdbc:h2:mem:test;MODE=MySQL
     driver-class-name: org.h2.Driver

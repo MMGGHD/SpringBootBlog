@@ -18,13 +18,8 @@
       </button>
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav">
-          <li class="nav-item">
-          <!-- href="" 안에는 endPoint만 적어주면 된다.-->
-            <a class="nav-link" href="/joinForm">회원가입</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/loginForm">로그인</a>
-          </li>
+          {{#sessionUser}}
+
           <li class="nav-item">
             <a class="nav-link" href="/board/saveForm">글쓰기</a>
           </li>
@@ -34,6 +29,18 @@
           <li class="nav-item">
             <a class="nav-link" href="/logout">로그아웃</a>
           </li>
+          {{/sessionUser}}
+
+          {{^sessionUser}}
+
+          <li class="nav-item">
+            <!-- href="" 안에는 endPoint만 적어주면 된다.-->
+            <a class="nav-link" href="/joinForm">회원가입</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/loginForm">로그인</a>
+          </li>
+          {{/sessionUser}}
         </ul>
       </div>
     </div>

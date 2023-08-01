@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
 
 @Controller
@@ -21,6 +24,40 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    // request는 가방, session은 락커
+    @Autowired
+    private HttpSession session;
+
+    @PostMapping({ "/login" })
+    public String login(LoginDTO loginDTO) {
+
+        // 유효성 검사 (부가기능)
+        if (loginDTO.getUsername() == null || loginDTO.getUsername().isEmpty()) {
+            return "redirect:/40x";
+        }
+        if (loginDTO.getPassword() == null || loginDTO.getPassword().isEmpty()) {
+            return "redirect:/40x";
+        }
+
+        try {
+            // 핵심기능
+            User user = userRepository.findByUsernameAndPassword(loginDTO);
+            /*
+             * <세션을 유지하기>
+             * User 정보로 로그인하면 서버측 User정보를 Key로 해서 session 집합에 저장 << setAttribute()
+             * 이때 Value값은 JSessionID가 되고 이는 서버가 유저에게 락커키를 준것.
+             * JSessionID는 Response될때 ResponseHeader의 Set-cookie에 담겨 클라이언트에게 보내짐
+             * 클라이언트측 브라우저는 받은 JSessionID를 cookie에 담아 다른 요청을 할때마다. 쿠키를 가지고간다.
+             * '프로토콜'이다. 개발자는 session에 유저정보를 담아주기만 하면 된다.
+             */
+
+            session.setAttribute("sessionUser", user);
+            return "redirect:/";
+        } catch (Exception e) {
+            return "redirect:/exLogin";
+        }
+
+    }
     // Get요청을 하는 방법
     // 1. a태그 (하이퍼 링크)
     // 2. form태그의 get메서드를 호출
@@ -29,6 +66,7 @@ public class UserController {
     // ip주소와 포트 부여: 10.5.9.200:8080 -> 불편하니까 도메인주소(DNS, mtcoding.com:8080)를 구매
     // 이때 포트번호가 80이면 생략가능
     // 자기 ip를 적으면 나갔다 다시 돌아온다 << 그래서 다시 나갔다 다시 돌아올 바에 루프백주소를 쓰면 된다
+
     @GetMapping({ "/joinForm" })
     public String joinForm() {
         return "user/joinForm";
@@ -44,8 +82,11 @@ public class UserController {
         return "user/updateForm";
     }
 
+    // 로그아웃은 세션만 무효화 해주면 된다.
     @GetMapping({ "/logout" })
     public String logout() {
+        // 하나하나 날리는 메서드도 있지만 invalidate로 한번에 날린다. (서랍을 비우기)
+        session.invalidate();
         return "redirect:/";
     }
 
