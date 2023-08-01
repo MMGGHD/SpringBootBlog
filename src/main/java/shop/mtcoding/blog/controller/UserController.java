@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.repository.UserRepository;
@@ -60,6 +62,8 @@ public class UserController {
         System.out.println("join메서드 실행됨");
 
         // 유효성 검사
+        // null값이 먼저 잡혀야 하기 때문에 null유효성 조건을 앞에둬야한다.
+        // .isEmpty() << .equals("") 와 같다.
         if (joinDTO.getUsername() == null || joinDTO.getUsername().isEmpty()) {
             return "redirect:/40x";
         }
@@ -70,7 +74,11 @@ public class UserController {
             return "redirect:/40x";
         }
 
-        userRepository.save(joinDTO);
+        try {
+            userRepository.save(joinDTO);
+        } catch (Exception e) {
+            return "redirect:/50x";
+        }
         return "redirect:/loginForm";
     }
 
@@ -86,6 +94,7 @@ public class UserController {
 
     @PostMapping({ "/join1" })
     public String join1(String username, Integer password, String email) {
+
         System.out.println("username : " + username);
         System.out.println("password : " + password);
         System.out.println("email : " + email);

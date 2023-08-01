@@ -24,7 +24,6 @@ public class UserRepository {
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
         query.executeUpdate();
-
     }
 
 }

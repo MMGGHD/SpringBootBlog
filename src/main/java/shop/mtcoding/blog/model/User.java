@@ -6,13 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @Table(name = "user_tb")
 @Entity // ddl-auto가 create이면 table만들어짐
 public class User {
@@ -24,7 +23,7 @@ public class User {
     @Column(nullable = false, length = 20, unique = true)
     private String username;
 
-    @Column(nullable = false, length = 20, unique = true)
+    @Column(nullable = false, length = 20)
     private String password;
 
     @Column(nullable = false, length = 20, unique = true)
