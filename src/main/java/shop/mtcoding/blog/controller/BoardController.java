@@ -31,6 +31,33 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
+    @PostMapping("/board/{id}/delete")
+    public String delete(@PathVariable Integer id) {
+
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+
+            // Error : 401 (인증안됨)
+            return "/loginForm";
+        }
+
+        if (boardRepository.findById(id).getUser().getId() != sessionUser.getId()) {
+
+            // Error : 403 (권한없음)
+            return "/40x";
+        }
+
+        boardRepository.deleteById(id);
+
+        // 1. @PathVariable
+        // 2. 인증검사 (postman으로 때릴수 있기 때문에)
+        // 2-1 인증이 안되면 로그인 페이지로
+        // 3. 유효성검사 필요 없음
+        // 4. BoardRepository.deleteById(id); << 호출, 리턴을 받지 마세요
+        // 5.
+        return "redirect:/";
+    }
+
     // <스프링에서 쿼리스트링 자동 파싱의 예시>
     // restful API << 주소설계 프로토콜(주소를 사람이봐도 알수 있게 짜야 한다)
     // restful API 조건 변수를 받는 방식 2가지 1) @PathVariable, 2)쿼리스트링
