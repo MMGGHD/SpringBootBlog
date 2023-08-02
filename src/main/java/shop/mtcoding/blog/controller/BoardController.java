@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.border.Border;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.bytebuddy.asm.MemberSubstitution.Substitution.Chain.Step.ForField.Write;
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
@@ -31,9 +33,22 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
-    @PostMapping("/board/{id}/delete")
-    public String delete(@PathVariable Integer id) {
+    @GetMapping("/board/{id}/updateForm")
+    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
+        // 1. 인증 검사
+        // 2. 권한 체크
+        // 3. 핵심 로직
+        Board board = boardRepository.findById(id);
+        request.setAttribute("board", board);
 
+        return "board/updateForm";
+    }
+
+    // 비슷한게 있어도 수정을 위한 DTO를 만들어야 한다.
+    @PostMapping("/board/{id}/update")
+    public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
+
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
 
@@ -41,20 +56,46 @@ public class BoardController {
             return "/loginForm";
         }
 
+        // 권한 검사
         if (boardRepository.findById(id).getUser().getId() != sessionUser.getId()) {
 
             // Error : 403 (권한없음)
             return "/40x";
         }
 
-        boardRepository.deleteById(id);
+        // 핵심 로직
+        boardRepository.update(updateDTO, id);
+        return "redirect:/board/" + id;
+    }
 
+    @PostMapping("/board/{id}/delete")
+    public String delete(@PathVariable Integer id) {
+
+        // <요구 사항>
         // 1. @PathVariable
         // 2. 인증검사 (postman으로 때릴수 있기 때문에)
         // 2-1 인증이 안되면 로그인 페이지로
         // 3. 유효성검사 필요 없음
         // 4. BoardRepository.deleteById(id); << 호출, 리턴을 받지 마세요
-        // 5.
+
+        // 인증 검사
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+
+            // Error : 401 (인증안됨)
+            return "/loginForm";
+        }
+
+        // 권한 검사
+        if (boardRepository.findById(id).getUser().getId() != sessionUser.getId()) {
+
+            // Error : 403 (권한없음)
+            return "/40x";
+        }
+
+        // 핵심 로직
+        boardRepository.deleteById(id);
+
         return "redirect:/";
     }
 
