@@ -44,8 +44,9 @@ public class UserController {
             User user = userRepository.findByUsernameAndPassword(loginDTO);
             /*
              * <세션을 유지하기>
-             * User 정보로 로그인하면 서버측에서 User정보를 Value로 session 에 저장 << setAttribute()
-             * 이때 Value값은 JSessionID가 되고 이는 서버가 유저에게 락커키를 준것.
+             * 브라우저에서 HttpSession에 접근하는 순간 JSessionID(서랍키)가 부여됨
+             * JSessionID 마다 HashMap이 새로 생성되고, Key(key)-Value(유저정보)를 저장
+             * 즉, 브라우저마다 다른 HashMap이 생성되므로 브라우저 단위로 세션이 유지될 수 있다.
              * JSessionID는 Response될때 ResponseHeader의 Set-cookie에 담겨 클라이언트에게 보내짐
              * 클라이언트측 브라우저는 받은 JSessionID를 cookie에 담아 다른 요청을 할때마다. 쿠키를 가지고간다.
              * '프로토콜'이다. 개발자는 session에 유저정보를 담아주기만 하면 된다.
