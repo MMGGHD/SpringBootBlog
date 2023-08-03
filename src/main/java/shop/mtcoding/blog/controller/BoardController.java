@@ -134,10 +134,10 @@ public class BoardController {
         int totalCount = boardRepository.count();
         System.out.println("totalCount : " + totalCount);
         int totalPage = totalCount / 3;
-        if (totalCount % 3 > 0) {
-            totalPage = totalPage + 1;
+        if (totalCount % 3 == 0) {
+            totalPage = totalPage - 1;
         }
-        boolean last = totalPage - 1 == page;
+        boolean last = totalPage == page;
 
         System.out.println("테스트 : " + boardList.size());
         System.out.println("테스트 : " + boardList.get(0).getTitle());

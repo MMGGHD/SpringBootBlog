@@ -8,13 +8,16 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
 
@@ -38,10 +41,12 @@ public class UserController {
         if (loginDTO.getPassword() == null || loginDTO.getPassword().isEmpty()) {
             return "redirect:/40x";
         }
+        System.out.println("login 메서드 호출됨");
 
         try {
             // 핵심기능
             User user = userRepository.findByUsernameAndPassword(loginDTO);
+            System.out.println("세션들어감");
             /*
              * <세션을 유지하기>
              * 브라우저에서 HttpSession에 접근하는 순간 JSessionID(서랍키)가 부여됨
@@ -53,6 +58,7 @@ public class UserController {
              */
 
             session.setAttribute("sessionUser", user);
+
             return "redirect:/";
         } catch (Exception e) {
             return "redirect:/exLogin";
@@ -80,7 +86,17 @@ public class UserController {
 
     @GetMapping({ "/user/updateForm" })
     public String updateForm() {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/loginForm";
+        }
         return "user/updateForm";
+    }
+
+    @PostMapping("/update/{id}")
+    public String updateById(@PathVariable Integer id, UserUpdateDTO userUpdateDTO) {
+        userRepository.updateById(id, userUpdateDTO);
+        return "redirect:/loginForm";
     }
 
     // 로그아웃은 세션만 무효화 해주면 된다.
@@ -133,6 +149,7 @@ public class UserController {
     // DS가 메서드의 매개변수에있는 HSRequest(Response)타입의 매개변수를 받으면 추가 파싱 안하고 넣어줌
     // String username과 같은 매개변수를 넣으면 알아서 파싱해서 데이터를 찾아 넣어줌 (2차파싱)
     // 서버 구조 안에서 데이터(DB에서 온것이든, 요청문이든)를 전달할때 request(mustache에서는 model)을 사용
+    // yml 파일에 mustache에서도 HttpServletRequest를 사용할수 있게 설정하면 사용할수 있다.
 
     @PostMapping({ "/join1" })
     public String join1(String username, Integer password, String email) {
