@@ -20,42 +20,40 @@ public class UserRepository {
 
     // 중복코드로 인한 오류를 미리 예방할수 있도록 하는 안전한 코드
     public User findByUsername(String username) {
-        Query query = em.createNativeQuery(
-                "select * from user_tb where username=:username", User.class);
-        query.setParameter("username", username);
-        return (User) query.getSingleResult();
+        try {
+            Query query = em.createNativeQuery(
+                    "select * from user_tb where username=:username", User.class);
+            query.setParameter("username", username);
+            return (User) query.getSingleResult();
+        } catch (Exception e) {
+            // 찾은 결과가 없으면 null을 돌려줌
+            return null;
+        }
 
     }
 
     public User findByUsernameAndPassword(LoginDTO loginDTO) {
-        // System.out.println("테스트 : " + 5);
         Query query = em.createNativeQuery(
                 "select * from user_tb where username=:username and password=:password", User.class);
 
-        // System.out.println("테스트 : " + 6);
         query.setParameter("username", loginDTO.getUsername());
         query.setParameter("password", loginDTO.getPassword());
 
-        // System.out.println("테스트 : " + 7);
         return (User) query.getSingleResult();
 
     }
 
     @Transactional
     public void save(JoinDTO joinDTO) {
-        // System.out.println("테스트 : " + 1);
         Query query = em.createNativeQuery(
                 "insert into user_tb(username, password, email) values(:username, :password, :email)");
 
-        // System.out.println("테스트 : " + 2);
         query.setParameter("username", joinDTO.getUsername());
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
 
-        // System.out.println("테스트 : " + 3);
         query.executeUpdate();
 
-        // System.out.println("테스트 : " + 4);
     }
 
     @Transactional

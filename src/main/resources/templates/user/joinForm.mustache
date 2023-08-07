@@ -10,11 +10,12 @@
     <div class="card">
         <div class="card-header"><b>회원가입을 해주세요</b></div>
         <div class="card-body">
-            <form action="/join" method="post" enctype="application/x-www-form-urlencoded">
-                <div class="mb-3 mt-1">
-                    <input type="text" class="form-control" placeholder="Enter username" name="username" required
-                        maxlength="20">
-                    {{! '중복체크' 버튼을 클릭하면 자바스크립트 실행되어야함 << JS 통신 필요 }} <button type="button" onclick="check()">
+            <form action="/join" method="post" enctype="application/x-www-form-urlencoded" onsubmit="return valid()">
+                <div class=" mb-3 mt-1">
+                    <input type="text" id="username" class="form-control" placeholder="Enter username" name="username"
+                        required maxlength="20" onchange="usernameChange()">
+                    <!-- {{! '중복체크' 버튼을 클릭하면 자바스크립트 실행되어야함 << JS 통신 필요 }}  -->
+                    <button type="button" onclick="check()">
                         중복체크</button>
                 </div>
                 <div class="mb-3">
@@ -28,30 +29,71 @@
 
                 <!-- type="submit" << Form태그 input 내의 정보를 '한번에' 전송한다.-->
                 <!-- 반드시 form태그 안에 있어야 적용된다.-->
-                <button type="submit" class="btn btn-primary form-control">회원가입</button>
+                <button type="submit" id="btnJoin" class="btn btn-primary form-control">회원가입</button>
         </div>
     </div>
     </form>
 
     <script>
-        function check() {
-            // fetch << JS가 제공하는 기본함수(promise로 구성됨)
-            // fetch() << Spring에 ()안에있는 URL을 보냄
-            // 응답코드가 200대면 then()실행
-            // 응답코드가 나머지면 catch()실행
-            fetch("/check?username=ssar")
-                // Spring에서 준 응답이 resp로 들어오게 된다.
-                // 에러가 발생했을때는 err로 들어가게 된다.
-                .then((resp) => {
-                    // 상태코드가 200(정상)이냐 아니냐로 로직 구분
-                    if (resp.status == 200) {
-                        alert("유저네임이 중복되지 않았습니다. 사용하셔도 됩니다.")
-                    } else {
-                        alert("유저네임이 중복되었습니다.")
-                    }
-                }).catch((err) => {
-                    console.log(err)
-                })
+
+        // 전역변수
+        // usernameSameCheck << 유저네임 체크 했니?
+        let usernameSameCheck = false;
+
+        function usernameChange() {
+            console.log("변경됨");
+            usernameSameCheck = false;
+        }
+
+        // 프론트엔드가 valid() 함수를 .js파일로 연결해서 유효성 검사를 한다.
+        // onsubmit에서 return값이 true면 실행, false면 안함
+        function valid() {
+            if (usernameSameCheck) {
+                return true;
+            } else {
+                alert("유저네임 중복을 확인하세요");
+                return false;
+            }
+        }
+
+        // check()의 책임
+        // input태그로 부터 username을 가져와서 통신을 요청하고, 중복이 되었는지 확인한다.
+        async function check() {
+
+            // << 1. DOM으로 부터 값 가져오기 >>
+            let username = document.querySelector("#username").value;
+
+            console.log("유저네임", username);
+
+            // << 2. 통신하기 >>
+            // 원래 let response = fetch(`/check?username=${username}`); << 이다.
+            // fetch 는 스프링의 Controller를 때릴수 있다.
+            // fetch 안에 `(백틱)을 쓰면 $달러로 바인딩이 가능하다
+            // fetch(통신) 오래 걸리는 메서드이므로 이벤트 큐에 등록된다.
+            // 그래서 스코프가 기다리도록 키워드 await를 사용한다.
+            // 기다리는 동안 fetch가 아직 실행되지 않았기에 response변수는 null이 된다.
+            // 받는 response는 헤더와 바디가 둘다 있는 데이터 형태이다
+            // await를 사용할때 비동기함수라는것을 알리기 위해 function앞에 async를 붙인다.
+            let response = await fetch(`/check?username=${username}`);
+
+            // << 3. 파싱하기 >>
+            // 파싱도 기다리는 (이벤트 큐 등록) 메서드이다 << await 키워드
+            // json파일 이면 response.json()를 쓴다.
+            // .json()은 .text()를 객체형식으로 파싱해주는 메서드다.
+            let responseBody = await response.text();
+
+            // << 4. 상태코드 확인 >>
+            let btnJoin = document.querySelector('#btnJoin');
+            if (response.status == 200) {
+                alert(responseBody);
+                usernameSameCheck = true;
+            } else {
+                alert(responseBody);
+                usernameSameCheck = false;
+            }
+
+            // << 5. 비지니스 로직 >>
+
         }
     </script>
     {{> /layout/footer}}

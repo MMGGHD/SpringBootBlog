@@ -36,18 +36,18 @@ public class UserController {
     private HttpSession session;
 
     // localhost:8080/check?username=ssar
+    // ResponseEntity를 쓰면 <>타입의 '데이터'를 응답 (@ResponseBody 안붙여도됨)
+    // 또한 HttpStatus(상태코드)를 같이 기입할수 있음
+    // 이 상태코드를 통해서 로직을 짜게된다. 그래서 프로토콜로 정해져있다.
+    // body메시지는 사람에게 표시하기 위해 필요한것
     @GetMapping("/check")
     public ResponseEntity<String> check(String username) {
-        // ResponseEntity를 쓰면 <>타입의 '데이터'를 응답 (@ResponseBody 안붙여도됨)
-        // 또한 HttpStatus(상태코드)를 같이 기입할수 있음
-        // 이 상태코드를 통해서 로직을 짜게된다. 그래서 프로토콜로 정해져있다.
-        try {
-            userRepository.findByUsername(username);
-            return new ResponseEntity<String>("중복됨", HttpStatus.BAD_REQUEST);
+        User user = userRepository.findByUsername(username);
 
-        } catch (Exception e) {
-            return new ResponseEntity<String>("중복되지 않음", HttpStatus.OK);
+        if (user != null) {
+            return new ResponseEntity<String>("중복됨", HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<String>("중복되지 않음", HttpStatus.OK);
     }
 
     @PostMapping({ "/login" })
@@ -136,7 +136,7 @@ public class UserController {
     @PostMapping({ "/join" })
     public String join(JoinDTO joinDTO) {
 
-        // 유효성 검사
+        // 유효성 검사 (프론트에서 막아도 Postman등 다이렉트로 오는것은 막을수 없기때문에 한다.)
         // null값이 먼저 잡혀야 하기 때문에 null유효성 조건을 앞에둬야한다.
         // .isEmpty() << .equals("") 와 같다.
         if (joinDTO.getUsername() == null || joinDTO.getUsername().isEmpty()) {
@@ -154,14 +154,13 @@ public class UserController {
         // 그래서 DB의 Transection과정에 대해 이해해야 한다
         // 중복되지 않으면 (가져왔는데 null이면) << save코드가 실행됨
         // (null이면 프레임워크에서 오류를 터트리기 때문에 try-catch를 걸어준다.)
-        try {
-            userRepository.findByUsername(joinDTO.getUsername());
+        User user = userRepository.findByUsername(joinDTO.getUsername());
+        if (user != null) {
             return "redirect:/50x";
-        } catch (Exception e) {
-            // 핵심기능
-            userRepository.save(joinDTO);
-            return "redirect:/loginForm";
         }
+        // 핵심기능
+        userRepository.save(joinDTO);
+        return "redirect:/loginForm";
     }
 
     // <<정상>바디 데이터 파싱까지 DS에게 시키는방법>
