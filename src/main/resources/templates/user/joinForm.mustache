@@ -14,6 +14,8 @@
                 <div class="mb-3 mt-1">
                     <input type="text" class="form-control" placeholder="Enter username" name="username" required
                         maxlength="20">
+                    {{! '중복체크' 버튼을 클릭하면 자바스크립트 실행되어야함 << JS 통신 필요 }} <button type="button" onclick="check()">
+                        중복체크</button>
                 </div>
                 <div class="mb-3">
                     <input type="password" class="form-control" placeholder="Enter password" name="password" required
@@ -31,4 +33,25 @@
     </div>
     </form>
 
+    <script>
+        function check() {
+            // fetch << JS가 제공하는 기본함수(promise로 구성됨)
+            // fetch() << Spring에 ()안에있는 URL을 보냄
+            // 응답코드가 200대면 then()실행
+            // 응답코드가 나머지면 catch()실행
+            fetch("/check?username=ssar")
+                // Spring에서 준 응답이 resp로 들어오게 된다.
+                // 에러가 발생했을때는 err로 들어가게 된다.
+                .then((resp) => {
+                    // 상태코드가 200(정상)이냐 아니냐로 로직 구분
+                    if (resp.status == 200) {
+                        alert("유저네임이 중복되지 않았습니다. 사용하셔도 됩니다.")
+                    } else {
+                        alert("유저네임이 중복되었습니다.")
+                    }
+                }).catch((err) => {
+                    console.log(err)
+                })
+        }
+    </script>
     {{> /layout/footer}}

@@ -132,7 +132,7 @@ public class BoardController {
 
         // LastPage는 DB에서 카운트 연산해야함 (boardRepository.count())
         int totalCount = boardRepository.count();
-        System.out.println("totalCount : " + totalCount);
+        // System.out.println("totalCount : " + totalCount);
         int totalPage = totalCount / 3;
         if (totalCount % 3 == 0) {
             totalPage = totalPage - 1;

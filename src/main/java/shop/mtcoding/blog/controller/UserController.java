@@ -4,9 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
@@ -31,6 +35,21 @@ public class UserController {
     @Autowired
     private HttpSession session;
 
+    // localhost:8080/check?username=ssar
+    @GetMapping("/check")
+    public ResponseEntity<String> check(String username) {
+        // ResponseEntity를 쓰면 <>타입의 '데이터'를 응답 (@ResponseBody 안붙여도됨)
+        // 또한 HttpStatus(상태코드)를 같이 기입할수 있음
+        // 이 상태코드를 통해서 로직을 짜게된다. 그래서 프로토콜로 정해져있다.
+        try {
+            userRepository.findByUsername(username);
+            return new ResponseEntity<String>("중복됨", HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            return new ResponseEntity<String>("중복되지 않음", HttpStatus.OK);
+        }
+    }
+
     @PostMapping({ "/login" })
     public String login(LoginDTO loginDTO) {
 
@@ -41,12 +60,11 @@ public class UserController {
         if (loginDTO.getPassword() == null || loginDTO.getPassword().isEmpty()) {
             return "redirect:/40x";
         }
-        System.out.println("login 메서드 호출됨");
 
         try {
             // 핵심기능
             User user = userRepository.findByUsernameAndPassword(loginDTO);
-            System.out.println("세션들어감");
+
             /*
              * <세션을 유지하기>
              * 브라우저에서 HttpSession에 접근하는 순간 JSessionID(서랍키)가 부여됨
@@ -117,7 +135,6 @@ public class UserController {
     // 또한 변수의 갯수나 타입이 바뀌어도 메서드를 바꾸지 않는다.
     @PostMapping({ "/join" })
     public String join(JoinDTO joinDTO) {
-        System.out.println("join메서드 실행됨");
 
         // 유효성 검사
         // null값이 먼저 잡혀야 하기 때문에 null유효성 조건을 앞에둬야한다.
@@ -132,12 +149,19 @@ public class UserController {
             return "redirect:/40x";
         }
 
+        // 트랜젝션(write)이 실행되는 save코드와 달리 DBMS실행에서 효율적인 코드가 좋다.
+        // DB에 해당 username이 있는지 read작업(중복체크)만 하는 코드 필요
+        // 그래서 DB의 Transection과정에 대해 이해해야 한다
+        // 중복되지 않으면 (가져왔는데 null이면) << save코드가 실행됨
+        // (null이면 프레임워크에서 오류를 터트리기 때문에 try-catch를 걸어준다.)
         try {
-            userRepository.save(joinDTO);
-        } catch (Exception e) {
+            userRepository.findByUsername(joinDTO.getUsername());
             return "redirect:/50x";
+        } catch (Exception e) {
+            // 핵심기능
+            userRepository.save(joinDTO);
+            return "redirect:/loginForm";
         }
-        return "redirect:/loginForm";
     }
 
     // <<정상>바디 데이터 파싱까지 DS에게 시키는방법>
