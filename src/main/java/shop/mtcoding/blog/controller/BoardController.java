@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import net.bytebuddy.asm.MemberSubstitution.Substitution.Chain.Step.ForField.Write;
+import shop.mtcoding.blog.dto.BoardDetailDTO;
 import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
@@ -34,9 +36,6 @@ public class BoardController {
 
     @Autowired
     private BoardRepository boardRepository;
-
-    @Autowired
-    ReplyRepository replyRepository;
 
     @GetMapping("/board/{id}/updateForm")
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
@@ -193,21 +192,20 @@ public class BoardController {
 
     // 권한체크가 필요함
     @GetMapping({ "/board/{id}" })
-    public String detail(@PathVariable Integer id, String userId, HttpServletRequest request) {
+    public String detail(@PathVariable Integer id, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser"); // 세션접근
-        Board board = boardRepository.findById(id);
-        boolean pageOwner = false;
-        boolean replyOwner = false;
-        if (sessionUser != null) {
-            pageOwner = sessionUser.getId() == board.getUser().getId();
+        List<BoardDetailDTO> dtos = null;
+        if (sessionUser == null) {
+            dtos = boardRepository.findByIdJoinReply(id, null);
+        } else {
+            dtos = boardRepository.findByIdJoinReply(id, sessionUser.getId());
         }
-        System.out.println("userId :" + userId);
-        List<Reply> replyList = replyRepository.findReplyByBoard(id);
-
-        request.setAttribute("board", board);
+        boolean pageOwner = false;
+        if (sessionUser != null) {
+            pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId();
+        }
+        request.setAttribute("dtos", dtos);
         request.setAttribute("pageOwner", pageOwner);
-        request.setAttribute("replyList", replyList);
-        request.setAttribute("replyOwner", replyOwner);
         return "board/detail";
     }
 

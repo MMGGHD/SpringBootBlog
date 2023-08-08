@@ -7,10 +7,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.qlrm.mapper.JpaResultMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import shop.mtcoding.blog.dto.BoardDetailDTO;
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
 import shop.mtcoding.blog.dto.UpdateDTO;
@@ -88,5 +90,34 @@ public class BoardRepository {
         query.setParameter("title", updateDTO.getTitle());
         query.setParameter("content", updateDTO.getContent());
         query.executeUpdate();
+    }
+
+    public List<BoardDetailDTO> findByIdJoinReply(Integer boardId, Integer sessionUserId) {
+        String sql = "select ";
+        sql += " bt.id board_id,";
+        sql += " bt.user_id board_user_id,";
+        sql += " rt.id reply_id,";
+        sql += " rt.comment reply_comment,";
+        sql += " rt.user_id reply_user_id,";
+        sql += " rt.board_id reply_board_id,";
+        sql += " ru.username reply_user_username,";
+        if (sessionUserId == null) {
+            sql += " false reply_owner ";
+        } else {
+            sql += " case when rt.user_id = :sessionUserId then true else false end reply_owner";
+        }
+        sql += " from";
+        sql += " board_tb bt left outer join reply_tb rt on  bt.id = rt.board_id";
+        sql += " left outer join user_tb ru on rt.user_id = ru.id";
+        sql += " where bt.id = :boardId";
+        sql += " order by rt.id desc";
+        Query query = em.createNativeQuery(sql);
+        query.setParameter("boardId", boardId);
+        if (sessionUserId != null) {
+            query.setParameter("sessionUserId", sessionUserId);
+        }
+        JpaResultMapper mapper = new JpaResultMapper();
+        List<BoardDetailDTO> dtos = mapper.list(query, BoardDetailDTO.class);
+        return dtos;
     }
 }
