@@ -5,4 +5,16 @@ insert into board_tb(title, content, user_id, created_at) values('제목2', '내
 insert into board_tb(title, content, user_id, created_at) values('제목3', '내용3', 1, now());
 insert into board_tb(title, content, user_id, created_at) values('제목4', '내용4', 2, now());
 insert into board_tb(title, content, user_id, created_at) values('제목5', '내용5', 2, now());
-        
+insert into reply_tb(comment, user_id, board_id) values('쌀', 1, 3);
+insert into reply_tb(comment, user_id, board_id) values('감자', 1, 2);
+insert into reply_tb(comment, user_id, board_id) values('딸기', 2, 1);
+insert into reply_tb(comment, user_id, board_id) values('수박', 2, 5);
+insert into reply_tb(comment, user_id, board_id) values('사과', 2, 4);
+insert into reply_tb(comment, user_id, board_id) values('배', 1, 3);
+insert into reply_tb(comment, user_id, board_id) values('멜론', 2, 2);
+insert into reply_tb(comment, user_id, board_id) values('사과', 1, 1);
+insert into reply_tb(comment, user_id, board_id) values('수박', 2, 5);
+insert into reply_tb(comment, user_id, board_id) values('배', 2, 3);
+insert into reply_tb(comment, user_id, board_id) values('멜론', 1, 2);
+insert into reply_tb(comment, user_id, board_id) values('사과', 2, 1);
+insert into reply_tb(comment, user_id, board_id) values('수박', 1, 4);

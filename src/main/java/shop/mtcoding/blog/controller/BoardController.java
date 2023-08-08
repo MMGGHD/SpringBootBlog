@@ -21,8 +21,10 @@ import net.bytebuddy.asm.MemberSubstitution.Substitution.Chain.Step.ForField.Wri
 import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
+import shop.mtcoding.blog.model.Reply;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
+import shop.mtcoding.blog.repository.ReplyRepository;
 
 @Controller
 public class BoardController {
@@ -32,6 +34,9 @@ public class BoardController {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    @Autowired
+    ReplyRepository replyRepository;
 
     @GetMapping("/board/{id}/updateForm")
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
@@ -188,17 +193,21 @@ public class BoardController {
 
     // 권한체크가 필요함
     @GetMapping({ "/board/{id}" })
-    public String detail(@PathVariable Integer id, HttpServletRequest request) {
-
+    public String detail(@PathVariable Integer id, String userId, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser"); // 세션접근
         Board board = boardRepository.findById(id);
         boolean pageOwner = false;
+        boolean replyOwner = false;
         if (sessionUser != null) {
             pageOwner = sessionUser.getId() == board.getUser().getId();
         }
+        System.out.println("userId :" + userId);
+        List<Reply> replyList = replyRepository.findReplyByBoard(id);
 
         request.setAttribute("board", board);
         request.setAttribute("pageOwner", pageOwner);
+        request.setAttribute("replyList", replyList);
+        request.setAttribute("replyOwner", replyOwner);
         return "board/detail";
     }
 
