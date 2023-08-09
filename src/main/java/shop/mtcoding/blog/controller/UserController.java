@@ -90,14 +90,16 @@ public class UserController {
                 session.setAttribute("sessionUser", user);
 
                 System.out.println("테스트 : session부여 객체 : " + (User) session.getAttribute("sessionUser"));
+
+                return "redirect:/";
             }
-            return "redirect:/";
         } catch (
 
         Exception e) {
             return "redirect:/exLogin";
         }
 
+        return "redirect:/exLogin";
     }
     // Get요청을 하는 방법
     // 1. a태그 (하이퍼 링크)
@@ -136,7 +138,7 @@ public class UserController {
 
         System.out.println("테스트 : userUpdateDTO.get 암호 : " + userUpdateDTO.getPassword());
         userRepository.updateById(id, userUpdateDTO);
-        return "redirect:/loginForm";
+        return "redirect:/";
     }
 
     // 로그아웃은 세션만 무효화 해주면 된다.
