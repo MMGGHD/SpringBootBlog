@@ -53,14 +53,22 @@ public class ReplyController {
 
         // 댓글 쓰기
         replyRepository.save(replyWriteDTO, sessionUser.getId());
-        System.out.println("save 메서드 완료");
         return "redirect:/board/" + replyWriteDTO.getBoardId();
     }
 
     @GetMapping("/reply/{id}/update")
     public String replyUpdate(@PathVariable Integer id, HttpServletRequest request) {
         // 1. 인증 검사
-        // 2. 권한 체크
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            // Error : 401 (인증안됨)
+            return "/loginForm";
+        }
+        // 권한 검사
+        if (replyRepository.findByReplyId(id).getUser().getId() != sessionUser.getId()) {
+            // Error : 403 (권한없음)
+            return "/40x";
+        }
         // 3. 핵심 로직
         Reply reply = replyRepository.findByReplyId(id);
         request.setAttribute("reply", reply);
@@ -70,13 +78,13 @@ public class ReplyController {
 
     @PostMapping("/board/{id}/replyUpdate")
     public String update(@PathVariable Integer id, String content) {
-        System.out.println("테스트 : replyUpdate 호출됨 content값 : " + content);
         // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             // Error : 401 (인증안됨)
             return "/loginForm";
         }
+
         // 권한 검사
         if (replyRepository.findByReplyId(id).getUser().getId() != sessionUser.getId()) {
 
@@ -87,7 +95,6 @@ public class ReplyController {
         // 핵심 로직
         replyRepository.replyUpdateById(id, content);
 
-        System.out.println("테스트 : replyUpdateById 호출됨");
         return "redirect:/board/" + replyRepository.findByReplyId(id).getBoard().getId();
     }
 
@@ -97,9 +104,7 @@ public class ReplyController {
         // 2. 권한 체크
         // 3. 핵심 로직
         int page = replyRepository.findByReplyId(id).getBoard().getId();
-        System.out.println("테스트 replyDelete 호출됨 : " + id);
         replyRepository.replyDelete(id);
-        System.out.println("테스트 replyDelete 컨트롤러 완료됨");
         return "redirect:/board/" + page;
     }
 }

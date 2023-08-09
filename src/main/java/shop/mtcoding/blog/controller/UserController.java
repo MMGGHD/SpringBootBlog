@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,7 @@ public class UserController {
 
     @PostMapping({ "/login" })
     public String login(LoginDTO loginDTO) {
+        System.out.println("테스트 : login Controller 호출");
 
         // 유효성 검사 (부가기능)
         if (loginDTO.getUsername() == null || loginDTO.getUsername().isEmpty()) {
@@ -61,10 +63,18 @@ public class UserController {
             return "redirect:/40x";
         }
 
+        System.out.println("테스트 : login Controller 유효성 검사 완료");
+
+        System.out.println("테스트 : loginDTO findByUsername : " + loginDTO.getUsername());
+        System.out.println("테스트 : loginDTO findByUsername : " + loginDTO.getPassword());
         try {
             // 핵심기능
-            User user = userRepository.findByUsernameAndPassword(loginDTO);
 
+            User user = userRepository.findByUsername(loginDTO.getUsername());
+
+            System.out.println("테스트 : loginDTO findByUsername 메서드 호출완료");
+            System.out.println("테스트 : loginDTO findUsername  : " + user.getUsername());
+            System.out.println("테스트 : loginDTO findPassword : " + user.getPassword());
             /*
              * <세션을 유지하기>
              * 브라우저에서 HttpSession에 접근하는 순간 JSessionID(서랍키)가 부여됨
@@ -74,11 +84,17 @@ public class UserController {
              * 클라이언트측 브라우저는 받은 JSessionID를 cookie에 담아 다른 요청을 할때마다. 쿠키를 가지고간다.
              * '프로토콜'이다. 개발자는 session에 유저정보를 담아주기만 하면 된다.
              */
+            if (BCrypt.checkpw(loginDTO.getPassword(), user.getPassword())) {
+                System.out.println("테스트 : loginDTO해시와 user.getPassword()값 비교 : "
+                        + BCrypt.checkpw(loginDTO.getPassword(), user.getPassword()));
+                session.setAttribute("sessionUser", user);
 
-            session.setAttribute("sessionUser", user);
-
+                System.out.println("테스트 : session부여 객체 : " + (User) session.getAttribute("sessionUser"));
+            }
             return "redirect:/";
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             return "redirect:/exLogin";
         }
 
@@ -113,6 +129,12 @@ public class UserController {
 
     @PostMapping("/update/{id}")
     public String updateById(@PathVariable Integer id, UserUpdateDTO userUpdateDTO) {
+        System.out.println("테스트 : user updateById cotroller호출");
+        String encPassword = BCrypt.hashpw(userUpdateDTO.getPassword(), BCrypt.gensalt());
+        System.out.println("테스트 : userUpdateDTO 암호 해싱 : " + encPassword);
+        userUpdateDTO.setPassword(encPassword);
+
+        System.out.println("테스트 : userUpdateDTO.get 암호 : " + userUpdateDTO.getPassword());
         userRepository.updateById(id, userUpdateDTO);
         return "redirect:/loginForm";
     }
@@ -148,18 +170,26 @@ public class UserController {
         if (joinDTO.getEmail() == null || joinDTO.getEmail().isEmpty()) {
             return "redirect:/40x";
         }
-
+        System.out.println("테스트 : Join 무결성 검사");
         // 트랜젝션(write)이 실행되는 save코드와 달리 DBMS실행에서 효율적인 코드가 좋다.
         // DB에 해당 username이 있는지 read작업(중복체크)만 하는 코드 필요
         // 그래서 DB의 Transection과정에 대해 이해해야 한다
         // 중복되지 않으면 (가져왔는데 null이면) << save코드가 실행됨
         // (null이면 프레임워크에서 오류를 터트리기 때문에 try-catch를 걸어준다.)
         User user = userRepository.findByUsername(joinDTO.getUsername());
+        System.out.println("테스트 : findByUsername");
         if (user != null) {
             return "redirect:/50x";
         }
         // 핵심기능
+
+        String encPassword = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
+        System.out.println("테스트 :joinDTO 해시암호 생성 : " + encPassword);
+        joinDTO.setPassword(encPassword);
+        System.out.println("테스트 :joinDTO Set하고 get메서드 호출 : " + joinDTO.getPassword());
         userRepository.save(joinDTO);
+
+        System.out.println("테스트 :joinDTO Save메서드 실행완료  : ");
         return "redirect:/loginForm";
     }
 

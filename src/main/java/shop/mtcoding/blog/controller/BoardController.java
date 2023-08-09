@@ -143,9 +143,6 @@ public class BoardController {
         }
         boolean last = totalPage == page;
 
-        System.out.println("테스트 : " + boardList.size());
-        System.out.println("테스트 : " + boardList.get(0).getTitle());
-
         // 아래처럼 페이지를 위한 데이터를 페이징 데이터라고 한다.
         request.setAttribute("boardList", boardList);
         request.setAttribute("prevPage", page - 1);
@@ -190,7 +187,9 @@ public class BoardController {
         return "redirect:/";
     }
 
-    // 권한체크가 필요함
+    // BoardDetailDTO를 만든 이유
+    // 1. 담을 그릇이 없다.
+    // 1. 담을 그릇이 없다.
     @GetMapping({ "/board/{id}" })
     public String detail(@PathVariable Integer id, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser"); // 세션접근

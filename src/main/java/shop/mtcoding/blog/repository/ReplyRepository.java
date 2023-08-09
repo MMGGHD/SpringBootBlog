@@ -16,6 +16,7 @@ import shop.mtcoding.blog.model.User;
 
 @Repository
 public class ReplyRepository {
+
     @Autowired
     private EntityManager em;
 
@@ -59,13 +60,10 @@ public class ReplyRepository {
     @Transactional
     public void replyDelete(Integer id) {
 
-        System.out.println("테스트 replyDelete 실행됨");
         Query query = em.createNativeQuery(
                 "delete from reply_tb where id= :id");
         query.setParameter("id", id);
 
-        System.out.println("테스트 replyDelete 쿼리작성 완료 됨");
         query.executeUpdate();
-        System.out.println("테스트 replyDelete 완료 됨");
     }
 }

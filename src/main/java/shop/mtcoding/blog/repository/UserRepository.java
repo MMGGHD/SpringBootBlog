@@ -3,6 +3,7 @@ package shop.mtcoding.blog.repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class UserRepository {
 
     @Transactional
     public void save(JoinDTO joinDTO) {
+        System.out.println("테스트 :joinDTO Save메서드 호출 : ");
         Query query = em.createNativeQuery(
                 "insert into user_tb(username, password, email) values(:username, :password, :email)");
 
@@ -52,16 +54,20 @@ public class UserRepository {
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
 
+        System.out.println("테스트 :joinDTO Save쿼리 작성완료  : ");
         query.executeUpdate();
 
     }
 
     @Transactional
     public void updateById(Integer id, UserUpdateDTO userUpdateDTO) {
+        System.out.println("테스트 : user updateById 쿼리 메서드 실행");
         Query query = em.createNativeQuery(
                 "update user_tb set password = :password where id = :id");
         query.setParameter("password", userUpdateDTO.getPassword());
         query.setParameter("id", id);
         query.executeUpdate();
+
+        System.out.println("테스트 : user updateById 쿼리 메서드 완료");
     }
 }
