@@ -196,6 +196,7 @@ public class BoardController {
         User sessionUser = (User) session.getAttribute("sessionUser"); // 세션접근
         List<BoardDetailDTO> dtos = null;
         if (sessionUser == null) {
+            // 세션이 없다면
             dtos = boardRepository.findByIdJoinReply(id, null);
         } else {
             dtos = boardRepository.findByIdJoinReply(id, sessionUser.getId());

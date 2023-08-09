@@ -93,6 +93,9 @@ public class BoardRepository {
     }
 
     public List<BoardDetailDTO> findByIdJoinReply(Integer boardId, Integer sessionUserId) {
+        // 아래처럼 분기가 있는 쿼리를 동적쿼리라고 한다.
+        // 한개 함수안에서 if문으로 동적쿼리를 만들수도있고
+        // 쿼리 메서드를 여러개를 만들어서 써도 된다.
         String sql = "select ";
         sql += " bt.id board_id,";
         sql += " bt.user_id board_user_id,";

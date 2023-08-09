@@ -57,7 +57,7 @@ public class ReplyController {
         return "redirect:/board/" + replyWriteDTO.getBoardId();
     }
 
-    @GetMapping("/reply/{id}/delete")
+    @GetMapping("/reply/{id}/update")
     public String replyUpdate(@PathVariable Integer id, HttpServletRequest request) {
         // 1. 인증 검사
         // 2. 권한 체크
@@ -96,11 +96,10 @@ public class ReplyController {
         // 1. 인증 검사
         // 2. 권한 체크
         // 3. 핵심 로직
-        int a = id;
+        int page = replyRepository.findByReplyId(id).getBoard().getId();
         System.out.println("테스트 replyDelete 호출됨 : " + id);
         replyRepository.replyDelete(id);
-
-        System.out.println("테스트 replyDelete 호출 끝 : " + id);
-        return "redirect:/board/" + a;
+        System.out.println("테스트 replyDelete 컨트롤러 완료됨");
+        return "redirect:/board/" + page;
     }
 }
