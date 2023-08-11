@@ -128,14 +128,34 @@ public class BoardController {
     // @RequestParam << 값이 들어오지 않으면 기본값을 설정할수 있는 어노테이션
     // @RequestParam(defaultValue = "0") Integer page << page에 값 안들어오면 "0" 대입됨
     @GetMapping({ "/", "/board" })
-    public String index(@RequestParam(defaultValue = "0") Integer page, HttpServletRequest request) {
+    public String index(
+            // 검색버튼을 누르지 않는 일반적 상황에서 keyword는 null이다
+            // 입력값 없이 검색버튼을 누르는 상황에서 keyword는 ""(공백)이다
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0") Integer page,
+            HttpServletRequest request) {
 
-        List<Board> boardList = boardRepository.findAll(page);
+        List<Board> boardList = null;
+        int totalCount = 0;
+        boolean keywordOwner = false;
+
+        // keyword(검색어)가 있을때
+        if (keyword.isBlank()) {
+            boardList = boardRepository.findAll(page);
+            totalCount = boardRepository.count();
+            keywordOwner = false;
+            System.out.println("테스트 if keyword값 : 공백");
+        }
+        // keyword(검색어)가 없을때
+        else {
+            boardList = boardRepository.findAll(page, keyword);
+            totalCount = boardRepository.count(keyword);
+            keywordOwner = true;
+            System.out.println("테스트 else keyword값 : " + keyword);
+        }
 
         // Last 계산하는 과정 (복잡하니 다른메서드로 빼는것이 낫다)
-
         // LastPage는 DB에서 카운트 연산해야함 (boardRepository.count())
-        int totalCount = boardRepository.count();
         // System.out.println("totalCount : " + totalCount);
         int totalPage = totalCount / 3;
         if (totalCount % 3 == 0) {
@@ -151,6 +171,8 @@ public class BoardController {
         request.setAttribute("last", last);
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("totalCount", totalCount);
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("keywordOwner", keywordOwner);
 
         return "index";
     }

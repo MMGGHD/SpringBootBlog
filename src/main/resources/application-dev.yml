@@ -36,10 +36,10 @@ spring:
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
-    # show-sql: true
-    # properties:
-    #   hibernate:
-    #     format_sql: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   # JPA의 format_sql << 쿼리를 보기좋게 만들어줌
 
   output:

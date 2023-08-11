@@ -11,12 +11,14 @@
         <div class="card-header"><b>회원가입을 해주세요</b></div>
         <div class="card-body">
             <form action="/join" method="post" enctype="application/x-www-form-urlencoded" onsubmit="return valid()">
-                <div class=" mb-3 mt-1">
+                <div class=" mb-3 mt-1 d-flex justify-content-end">
                     <input type="text" id="username" class="form-control" placeholder="Enter username" name="username"
                         required maxlength="20" onchange="usernameChange()">
                     <!-- {{! '중복체크' 버튼을 클릭하면 자바스크립트 실행되어야함 << JS 통신 필요 }}  -->
-                    <button type="button" onclick="check()">
-                        중복체크</button>
+                    <div>
+                        <button type="button" onclick="check()" class="btn btn-secondary m-1"
+                            style="white-space: nowrap;">중복 확인</button>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <input type="password" class="form-control" placeholder="Enter password" name="password" required
@@ -26,13 +28,12 @@
                     <input type="email" class="form-control" placeholder="Enter email" name="email" required
                         maxlength="20">
                 </div>
-
                 <!-- type="submit" << Form태그 input 내의 정보를 '한번에' 전송한다.-->
                 <!-- 반드시 form태그 안에 있어야 적용된다.-->
                 <button type="submit" id="btnJoin" class="btn btn-primary form-control">회원가입</button>
+    </form>
         </div>
     </div>
-    </form>
 
     <script>
 

@@ -85,8 +85,10 @@ public class ReplyController {
             return "/loginForm";
         }
 
+        Integer replyUserId = replyRepository.findByReplyId(id).getUser().getId();
+
         // 권한 검사
-        if (replyRepository.findByReplyId(id).getUser().getId() != sessionUser.getId()) {
+        if (replyUserId != sessionUser.getId()) {
 
             // Error : 403 (권한없음)
             return "/40x";

@@ -11,7 +11,7 @@ public class BCryptTest {
         // DB에는 암호화 된 패스워드가 들어가야함
         String encPassword = BCrypt.hashpw("1234", BCrypt.gensalt());
         System.out.println("encPassword : " + encPassword);
-
+        System.out.println(encPassword.length());
         boolean isValid = BCrypt.checkpw("1234", encPassword);
         System.out.println(isValid);
     }

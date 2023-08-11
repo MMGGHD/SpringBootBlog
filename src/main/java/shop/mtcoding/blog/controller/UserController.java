@@ -92,14 +92,12 @@ public class UserController {
                 System.out.println("테스트 : session부여 객체 : " + (User) session.getAttribute("sessionUser"));
 
                 return "redirect:/";
+            } else {
+                return "redirect:/loginform";
             }
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             return "redirect:/exLogin";
         }
-
-        return "redirect:/exLogin";
     }
     // Get요청을 하는 방법
     // 1. a태그 (하이퍼 링크)
@@ -121,11 +119,15 @@ public class UserController {
     }
 
     @GetMapping({ "/user/updateForm" })
-    public String updateForm() {
+    public String updateForm(HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
             return "redirect:/loginForm";
         }
+
+        User user = userRepository.findByUsername(sessionUser.getUsername());
+        request.setAttribute("user", user);
+
         return "user/updateForm";
     }
 

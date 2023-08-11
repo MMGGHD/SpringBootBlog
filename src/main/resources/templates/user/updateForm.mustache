@@ -10,15 +10,15 @@
     <div class="card">
         <div class="card-header"><b>회원정보수정</b></div>
         <div class="card-body">
-            <form action="/update/{{sessionUser.id}}" method="post" enctype="application/x-www-form-urlencoded">
+            <form action="/update/{{user.id}}" method="post" enctype="application/x-www-form-urlencoded">
                 <div class="mb-3 mt-1">
-                    <input type="text" class="form-control" placeholder="Enter username" name="username" value="{{sessionUser.username}}" disabled >
+                    <input type="text" class="form-control" placeholder="Enter username" name="username" value="{{user.username}}" disabled >
                 </div>
                 <div class="mb-3">
                     <input type="password" class="form-control" placeholder="Enter password" name="password" >
                 </div>
                 <div class="mb-3">
-                    <input type="email" class="form-control" placeholder="Enter email" name="email" value="{{sessionUser.email}}" disabled>
+                    <input type="email" class="form-control" placeholder="Enter email" name="email" value="{{user.email}}" disabled>
                 </div>
                 <!-- type="submit" << Form태그 input 내의 정보를 '한번에' 전송한다.-->
                 <!-- 반드시 form태그 안에 있어야 적용된다.-->

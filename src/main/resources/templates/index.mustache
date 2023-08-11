@@ -3,21 +3,49 @@
 
 <div class="container p-5">
 
-    {{! {{#컬렉션 << for문  }}
-    {{#boardList}}
-    <div class="card m-3">
+    <div class="m-3 d-flex justify-content-end">
+        <form class="d-flex" action="/" method="get" onsubmit="return valid()">
+            <input class="form-control me-2" type="text" name="keyword" placeholder="Search" required>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+    {{! {{#컬렉션 << for문 }} 
+    {{#boardList}} <div class="card m-3">
         <div class="card-body">
-            <h4 class="card-title">{{title}}</h4>
+            <h4 class="card-title">{{{title}}}</h4>
             <a href="/board/{{id}}" class="btn btn-outline-danger">상세 보기</a>
         </div>
-    </div>
+</div>
+   <script>
+        function isWhitespace(str) {
+            return str.trim() === '';
+        }
+        function valid() {
+            let keyword = document.querySelector("#keyword").value;
+            console.log(keyword);
+            if (isWhitespace(keyword)) {
+                alert('공백을 입력할 수 없습니다');
+                return false;
+            }
+        }
+    </script>
+{{/boardList}}
+</ul>
+{{#keywordOwner}}
+<ul class="pagination d-flex justify-content-center">
+    <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prevPage}}&keyword={{keyword}}">Previous</a></li>
+    <li class="page-item {{#last}}disabled{{/last}}"><a class="page-link" href="?page={{nextPage}}&keyword={{keyword}}">Next</a></li>
     
-    {{/boardList}}
-
-    <ul class="pagination d-flex justify-content-center">
-        <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prevPage}}">Previous</a></li>
-        <li class="page-item {{#last}}disabled{{/last}}"><a class="page-link" href="?page={{nextPage}}">Next</a></li>
-    </ul>
+</ul>
+{{! keywordOwner true }}
+{{/keywordOwner}}
+{{^keywordOwner}}
+<ul class="pagination d-flex justify-content-center">
+    <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prevPage}}">Previous</a></li>
+    <li class="page-item {{#last}}disabled{{/last}}"><a class="page-link" href="?page={{nextPage}}">Next</a></li>
+</ul>
+{{! keywordOwner false }}
+{{/keywordOwner}}
 </div>
 
 
